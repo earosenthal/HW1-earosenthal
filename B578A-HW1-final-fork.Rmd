@@ -4,6 +4,9 @@ Biostat 578A HW1 Elisabeth Rosenthal
 
 
 ```{r}
+## zhangx88: Like you mentioned here, I think all R code shall not be evaluated because everything can be replicated
+## afterwards; also, if we indeed include the output in the markdown file, it will be too much going on on one 
+## single page 
 library(data.table)
 library(knitr)
 # access bioconductor
@@ -20,7 +23,9 @@ geo_con <- dbConnect(SQLite(),'GEOmetadb.sqlite')
 # want a table that contains title, gse accession number, gpl accession number, manufacturer and description of the platform where the manufacturer is Illumina, the contact is from Yale and the study includes HCV (hepatitis C virus)
 # select the columns from table that is created by joining tables gse_gpl, gpl, and gse where the gse accession numbers are the same.
 dbGetQuery(geo_con, "SELECT gse.title, gse_gpl.gse, gse_gpl.gpl, gpl.manufacturer, gpl.description FROM (gse_gpl JOIN gpl ON gse_gpl.gpl=gpl.gpl) j JOIN gse on gse.gse=j.gse WHERE (gpl.manufacturer LIKE '%Illum%' AND gse.contact LIKE '%Yale%' AND gse.summary LIKE '%HCV%') ")
-
+## zhangx88: I am really not sure about which ones of our output are the correct answer for this homework, I am
+## expecting an answer key posted. At least from what I have discussed with other people in the class, they have
+## searched gse.title instead of gse.summary. But yours could be correct though.
 # try to do same with data.table package
 # first get the tables I want
 gse <- data.table(dbGetQuery(geo_con, "SELECT gse, title, contact, summary FROM gse"))  
@@ -33,4 +38,5 @@ setkey(gse.gpl, "gse")
 
 # merge on"gpl" the table gpl with table that is a join gse and gse.gpl, keeping records that have 'HCV' in the summary and 'Yale' in the contact. Then keep only records that contain 'Illum' in the manufacturer. Then list just the four columns that we want output
 merge(gpl, (gse[gse.gpl][summary %like% 'HCV' & contact %like% 'Yale']), by="gpl")[manufacturer %like% 'Illum'][,list(title, gse, gpl,manufacturer, description)]
-
+### zhangx88: Now I see how to do it in one line but like I said in the comments regarding your comments to my hw1,
+### I agree that it is easier to follow when using multiple steps to get the same result.
